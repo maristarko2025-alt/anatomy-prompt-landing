@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap">
   <title>Анатомия Промта — Masha_DesignLab</title>
   <meta name="description" content="Формула идеального запроса. Как перестать писать в пустоту и начать управлять ИИ на языке смыслов. Бесплатный PDF-гайд по промт-инжинирингу." />
   <meta property="og:title" content="Анатомия Промта — Masha_DesignLab" />
@@ -48,6 +49,30 @@
       --radius: 4px;
       --transition: 0.2s ease;
       --max-width: 1320px;
+    }
+
+    .preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.4s ease;
+    }
+
+    .preloader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .preloader-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent-teal);
+      letter-spacing: 0.1em;
+      animation: blink 1s steps(1) infinite;
     }
 
     /* ========================================
@@ -730,6 +755,9 @@
 
 <body>
 
+  <div class="preloader" id="preloader">
+  <span class="preloader-text">// загрузка_</span>
+</div>
   <!-- ========================================
        HEADER — Шапка сайта
        Прилипает к верху. JS добавляет класс .scrolled при скролле.
@@ -1121,6 +1149,16 @@
 
       observer.observe(terminal);
     })();
+
+    (function initPreloader() {
+  var preloader = document.getElementById('preloader');
+  
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      preloader.classList.add('hidden');
+    }, 300);
+  });
+})();
   </script>
 
 </body>
