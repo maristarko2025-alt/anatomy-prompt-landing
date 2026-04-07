@@ -80,7 +80,7 @@
       width: 100%;
       max-width: var(--max-width);
       margin: 0 auto;
-      padding: 0 var(--space-4);
+      padding: 0 40px;
     }
 
     /* ========================================
@@ -232,6 +232,20 @@
 
     /* Класс .active открывает меню */
     .mobile-menu.active { transform: translateX(0); }
+
+    .mobile-menu-close {
+      position: absolute;
+      top: var(--space-2);
+      right: var(--space-3);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      padding: var(--space-1);
+      transition: color var(--transition);
+    }
+    .mobile-menu-close:hover { color: var(--accent-teal); }
 
     .mobile-nav {
       list-style: none;
@@ -702,6 +716,7 @@
        МОБИЛЬНЫЙ — 767px и ниже
        ======================================== */
     @media (max-width: 767px) {
+      .container { padding: 0 20px; }
       /* Копирайт: в столбик, по центру */
       .footer-copyright { flex-direction: column; gap: var(--space-1); text-align: center; }
 
@@ -758,6 +773,7 @@
 
     <!-- Мобильное выпадающее меню -->
     <nav class="mobile-menu" id="mobile-menu" aria-label="Мобильная навигация" aria-hidden="true">
+      <button class="mobile-menu-close" id="mobile-close" aria-label="Закрыть меню">✕</button>
       <ul class="mobile-nav">
         <li><a href="#author">Автор</a></li>
         <li><a href="#season1">Сезон 1</a></li>
@@ -1058,6 +1074,9 @@
       }
 
       burgerBtn.addEventListener('click', toggleMenu);
+
+      var closeBtn = document.getElementById('mobile-close');
+      if (closeBtn) closeBtn.addEventListener('click', closeMenu);
 
       /* Вешаем закрытие на ВСЕ ссылки внутри мобильного меню */
       var mobileLinks = mobileMenu.querySelectorAll('a');
