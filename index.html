@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>Анатомия Промта — Masha_DesignLab</title>
+  <meta name="description" content="Формула идеального запроса. Как перестать писать в пустоту и начать управлять ИИ на языке смыслов. Бесплатный PDF-гайд по промт-инжинирингу." />
+  <meta property="og:title" content="Анатомия Промта — Masha_DesignLab" />
+  <meta property="og:description" content="Формула идеального запроса. Бесплатный PDF-гайд по промт-инжинирингу." />
+  <meta property="og:type" content="website" />
+
+  <!-- Подключение шрифтов Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ========================================
+       ДИЗАЙН-ТОКЕНЫ — CSS-ПЕРЕМЕННЫЕ
+       Все цвета, размеры и анимации — только через переменные.
+       Никаких HEX-кодов в правилах напрямую!
+       ======================================== */
+    :root {
+      /* === ОСНОВНЫЕ ЦВЕТА === */
+      --bg-dark: #1A1A1A;         /* Deep Graphite — основной фон страницы */
+      --surface-dark: #252525;    /* Чуть светлее фона — поверхность карточек */
+      --border-dark: #3A3A3A;     /* Graphite — разделители и рамки */
+      --text-light: #F5F5F5;      /* White Smoke — основной текст */
+      --text-muted: #8A8A8A;      /* Приглушённый текст, подписи */
+
+      /* === АКЦЕНТЫ === */
+      --accent-orange: #FF9F43;   /* Neon Solar Orange — кнопки, выделения */
+      --accent-teal: #00B6C9;     /* Neon Deep Teal — hover, рамки, ссылки */
+
+      /* === ТИПОГРАФИКА === */
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-sans: 'Manrope', 'Arial', sans-serif;
+
+      /* === СЕТКА И ОТСТУПЫ (кратная 8px) === */
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 48px;
+      --space-6: 64px;
+      --space-7: 80px;
+      --space-8: 120px;
+
+      /* === ПРОЧЕЕ === */
+      --radius: 4px;
+      --transition: 0.2s ease;
+      --max-width: 1320px;
+    }
+
+    /* ========================================
+       ГЛОБАЛЬНЫЙ СБРОС И БАЗОВЫЕ СТИЛИ
+       ======================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth; /* Плавный скролл по якорям */
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* Обёртка контента */
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+    }
+
+    /* ========================================
+       HEADER — ШАПКА САЙТА
+       Прилипает к верху. Класс .scrolled добавляется через JS.
+       ======================================== */
+
+    /* Базовые стили шапки */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: var(--space-2) 0;
+      background-color: transparent;
+      border-bottom: 1px solid transparent;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    /* Класс .scrolled добавляется JS при скролле — лёгкое затемнение */
+    .header.scrolled {
+      background-color: rgba(26, 26, 26, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: var(--border-dark);
+    }
+
+    /* Внутренняя сетка: логотип | nav | кнопка */
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    /* Логотип: иконка + текст в строку */
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+      transition: color var(--transition);
+      flex-shrink: 0;
+    }
+    .header-logo:hover { color: var(--accent-teal); }
+
+    /* Иконка логотипа — плейсхолдер */
+    .header-logo-icon {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--accent-teal);
+      background-color: var(--surface-dark);
+      flex-shrink: 0;
+    }
+
+    /* Текст логотипа — скрыт на мобильном */
+    .header-logo-text { display: none; }
+
+    /* Центральная навигация — скрыта на мобильном */
+    .header-nav {
+      display: none;
+      align-items: center;
+      gap: var(--space-3);
+      list-style: none;
+    }
+
+    .header-nav a {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      white-space: nowrap;
+    }
+    .header-nav a:hover { color: var(--accent-teal); }
+
+    /* Ghost-кнопка (прозрачный фон + teal-рамка) */
+    .btn-ghost {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-teal);
+      background-color: transparent;
+      border: 1px solid var(--accent-teal);
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background-color var(--transition), color var(--transition);
+      white-space: nowrap;
+    }
+    .btn-ghost:hover {
+      background-color: var(--accent-teal);
+      color: var(--bg-dark);
+    }
+
+    /* CTA-кнопка в шапке — скрыта на мобильном */
+    .header-cta { display: none; flex-shrink: 0; }
+
+    /* Кнопка-гамбургер — только мобильный */
+    .header-burger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .header-burger span {
+      display: block;
+      width: 100%;
+      height: 1.5px;
+      background-color: var(--text-light);
+      transition: transform var(--transition), opacity var(--transition);
+      transform-origin: center;
+    }
+
+    /* Анимация гамбургера при активном меню */
+    .header-burger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .header-burger.active span:nth-child(2) { opacity: 0; }
+    .header-burger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* Мобильное выпадающее меню */
+    .mobile-menu {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 99;
+      background-color: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-7) var(--space-4) var(--space-5);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    /* Класс .active открывает меню */
+    .mobile-menu.active { transform: translateX(0); }
+
+    .mobile-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      flex: 1;
+    }
+    .mobile-nav a {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      display: block;
+      padding: var(--space-1) 0;
+    }
+    .mobile-nav a:hover { color: var(--accent-teal); }
+
+    /* CTA-кнопка в мобильном меню — отделена линией */
+    .mobile-menu-cta {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-dark);
+    }
+
+    /* ========================================
+       HERO — ГЛАВНАЯ СЕКЦИЯ
+       Сплит-экран: текст слева, терминал справа
+       ======================================== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: calc(var(--space-5) + 60px) 0 var(--space-5);
+    }
+
+    /* Фоновые боке-пятна — z-index: 0, контент — z-index: 1 */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* Боке 1: оранжевое, левый нижний угол */
+    .bokeh-1 {
+      position: absolute;
+      bottom: -10%; left: -5%;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      opacity: 0.12;
+      filter: blur(80px);
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    /* Боке 2: teal, правый верхний угол, противофаза */
+    .bokeh-2 {
+      position: absolute;
+      top: -10%; right: -5%;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      opacity: 0.10;
+      filter: blur(100px);
+      animation: drift 12s ease-in-out infinite alternate-reverse;
+    }
+
+    /* Анимация дрейфа боке — медленная, почти незаметная */
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to   { transform: translate(30px, -20px); }
+    }
+
+    .hero-content { position: relative; z-index: 1; width: 100%; }
+
+    /* Сетка Hero: mobile-first — одна колонка */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      align-items: center;
+    }
+
+    /* Левая колонка: текстовый блок */
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Тег-бейдж над заголовком */
+    .hero-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-teal);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-badge-dot { color: var(--accent-orange); font-size: 14px; line-height: 1; }
+
+    /* H1: главный заголовок */
+    .hero-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: clamp(36px, 6vw, 72px);
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+      color: var(--text-light);
+      margin: 0;
+    }
+
+    /* Вторая строка H1 — оранжевая */
+    .hero-title-accent { color: var(--accent-orange); display: block; }
+
+    /* Подзаголовок */
+    .hero-subtitle {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-top: var(--space-3);
+      max-width: 480px;
+    }
+
+    /* Строка тегов-пилюль */
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      margin-top: var(--space-3);
+    }
+
+    /* Отдельный тег-пилюля */
+    .hero-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      color: var(--text-muted);
+    }
+    .hero-tag-dot { font-size: 10px; line-height: 1; }
+    .hero-tag-dot.teal   { color: var(--accent-teal); }
+    .hero-tag-dot.orange { color: var(--accent-orange); }
+
+    /* Primary кнопка: оранжевый фон */
+    .btn-primary {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--bg-dark);
+      background-color: var(--accent-orange);
+      border: none;
+      border-radius: var(--radius);
+      padding: 14px 28px;
+      cursor: pointer;
+      margin-top: var(--space-4);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .btn-primary:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* ========================================
+       ТЕРМИНАЛ — ПРАВАЯ КОЛОНКА HERO
+       Glassmorphism: backdrop-filter: blur(16px).
+       Сквозь него просвечивают боке-пятна фона.
+       ======================================== */
+    .terminal {
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Шапка терминала: три точки + имя файла */
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 12px var(--space-2);
+      border-bottom: 1px solid var(--border-dark);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Три цветные точки (macOS-стиль) */
+    .terminal-dots { display: flex; gap: 6px; align-items: center; }
+    .terminal-dot  { width: 12px; height: 12px; border-radius: 50%; }
+    .terminal-dot.red    { background-color: #FF5F57; }
+    .terminal-dot.yellow { background-color: #FEBC2E; }
+    .terminal-dot.green  { background-color: #28C840; }
+
+    /* Имя файла */
+    .terminal-filename { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+
+    /* Тело терминала */
+    .terminal-body {
+      padding: var(--space-3);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      min-height: 340px;
+    }
+
+    /* Строка кода — начальное состояние: невидима */
+    .code-line {
+      display: flex;
+      gap: var(--space-2);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Класс .visible добавляется JS-эффектом typewriter */
+    .code-line.visible { opacity: 1; }
+
+    /* Номер строки */
+    .line-number {
+      color: var(--text-muted);
+      user-select: none;
+      min-width: 20px;
+      text-align: right;
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .line-content { flex: 1; }
+
+    /* === Синтаксическая подсветка === */
+    .token-comment    { color: var(--text-muted); }    /* Комментарии */
+    .token-selector   { color: var(--accent-teal); }   /* Селекторы */
+    .token-property   { color: var(--text-light); }    /* Свойства */
+    .token-value      { color: var(--accent-orange); } /* Значения */
+    .token-punctuation{ color: var(--text-muted); }    /* { } ; : */
+
+    /* Мигающий курсор █ — CSS-анимация blink, 1s, steps(1) */
+    .cursor {
+      display: inline-block;
+      color: var(--accent-teal);
+      animation: blink 1s steps(1) infinite;
+      font-weight: 700;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* Строка статуса (VS Code statusbar) */
+    .terminal-statusbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--accent-teal);
+      color: var(--bg-dark);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px var(--space-2);
+    }
+
+    /* ========================================
+       SECTION — ЗАГЛУШКИ СЕКЦИЙ
+       Пустые секции с правильными ID
+       ======================================== */
+    section {
+      padding: var(--space-8) 0;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    /* H2 в заглушках — маркеры для разработчика, не финальный контент */
+    .section-placeholder h2 {
+      font-family: var(--font-mono);
+      font-size: clamp(18px, 2vw, 24px);
+      font-weight: 500;
+      color: var(--border-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ========================================
+       CTA СЕКЦИЯ — ФИНАЛЬНЫЙ БЛОК
+       Скачать PDF перед футером
+       ======================================== */
+    .cta-section {
+      background-color: var(--surface-dark);
+      padding: var(--space-8) 0;
+      text-align: center;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .cta-section h2 {
+      font-family: var(--font-mono);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-light);
+      letter-spacing: -0.02em;
+    }
+
+    .cta-section p {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: var(--space-2) auto 0;
+      line-height: 1.6;
+    }
+
+    /* Большая CTA-кнопка */
+    .btn-primary-lg {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--bg-dark);
+      background-color: var(--accent-orange);
+      border: none;
+      border-radius: var(--radius);
+      padding: 16px 40px;
+      cursor: pointer;
+      margin-top: var(--space-4);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .btn-primary-lg:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary-lg:active { transform: scale(0.98); }
+
+    /* ========================================
+       FOOTER — МАССИВНЫЙ ТИПОГРАФИЧЕСКИЙ ФУТЕР
+       Две колонки на десктопе, одна на мобиле
+       ======================================== */
+    .footer {
+      background-color: var(--bg-dark);
+      border-top: 1px solid var(--border-dark);
+      padding: var(--space-7) 0 0;
+    }
+
+    /* Сетка футера: mobile-first — одна колонка */
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+      padding: 0 var(--space-5);
+    }
+
+    /* Логотип-типографика: три строки */
+    .footer-brand {
+      font-family: var(--font-mono);
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+    .footer-brand-line1 { color: var(--text-light); }
+    .footer-brand-line2 { color: var(--accent-orange); }
+    .footer-brand-line3 { color: var(--accent-teal); }
+
+    /* Подпись под логотипом */
+    .footer-desc {
+      margin-top: var(--space-3);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* Заголовок блока контактов */
+    .footer-contacts-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    /* Три кнопки-ссылки в столбик */
+    .footer-links { display: flex; flex-direction: column; gap: var(--space-1); }
+
+    /* Базовый стиль ссылки-кнопки */
+    .footer-link {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius);
+      padding: 10px 20px;
+      transition: border-color var(--transition), color var(--transition),
+                  background-color var(--transition), opacity var(--transition);
+    }
+
+    /* Кнопка 1: Teal-фон */
+    .footer-link.primary {
+      background-color: var(--accent-teal);
+      color: var(--bg-dark);
+      border-color: var(--accent-teal);
+    }
+    .footer-link.primary:hover { opacity: 0.88; }
+
+    /* Кнопка 2: светлый текст */
+    .footer-link.secondary { color: var(--text-light); }
+    .footer-link.secondary:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
+
+    /* Кнопка 3: приглушённый текст */
+    .footer-link.tertiary { color: var(--text-muted); }
+    .footer-link.tertiary:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
+
+    /* Строка копирайта */
+    .footer-copyright {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-dark);
+      padding: var(--space-2) var(--space-5);
+      margin-top: var(--space-5);
+    }
+    .footer-copyright span,
+    .footer-copyright a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .footer-copyright a { transition: color var(--transition); }
+    .footer-copyright a:hover { color: var(--accent-teal); }
+
+    /* ========================================
+       АДАПТИВНОСТЬ — ПЛАНШЕТ 768px+
+       ======================================== */
+    @media (min-width: 768px) {
+      .header-logo-text { display: block; }
+      .header-nav       { display: flex; }
+      .header-cta       { display: block; }
+      .header-burger    { display: none; }
+
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--space-7); }
+    }
+
+    /* ========================================
+       АДАПТИВНОСТЬ — ДЕСКТОП 1200px+
+       ======================================== */
+    @media (min-width: 1200px) {
+      /* Hero: сплит 50/50 */
+      .hero-grid { grid-template-columns: 1fr 1fr; gap: var(--space-6); }
+    }
+
+    /* ========================================
+       МОБИЛЬНЫЙ — 767px и ниже
+       ======================================== */
+    @media (max-width: 767px) {
+      /* Копирайт: в столбик, по центру */
+      .footer-copyright { flex-direction: column; gap: var(--space-1); text-align: center; }
+
+      /* Терминал: меньше отступов и шрифт */
+      .terminal-body { padding: var(--space-2); font-size: 11px; }
+      .terminal-statusbar { font-size: 9px; }
+      .statusbar-center { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========================================
+       HEADER — Шапка сайта
+       Прилипает к верху. JS добавляет класс .scrolled при скролле.
+       ======================================== -->
+  <header class="header" id="site-header">
+    <div class="container">
+      <div class="header-inner">
+
+        <!-- Логотип: иконка + текст -->
+        <a href="#hero" class="header-logo" aria-label="Masha_DesignLab — на главную">
+          <div class="header-logo-icon" aria-hidden="true">ML</div>
+          <span class="header-logo-text">Masha_DesignLab</span>
+        </a>
+
+        <!-- Центральная навигация — видна на планшете и десктопе -->
+        <nav aria-label="Основная навигация">
+          <ul class="header-nav">
+            <li><a href="#author">Автор</a></li>
+            <li><a href="#season1">Сезон 1</a></li>
+            <li><a href="#season2">Сезон 2 🔒</a></li>
+            <li><a href="#season3">Сезон 3 🔒</a></li>
+            <li><a href="#contact">Контакты</a></li>
+          </ul>
+        </nav>
+
+        <!-- CTA-кнопка — видна на планшете и десктопе -->
+        <div class="header-cta">
+          <a href="https://t.me/Masha_DesignLab" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+            Войти в Лабораторию
+          </a>
+        </div>
+
+        <!-- Кнопка-гамбургер — только мобильный -->
+        <button class="header-burger" id="burger-btn" aria-label="Открыть меню" aria-expanded="false">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Мобильное выпадающее меню -->
+    <nav class="mobile-menu" id="mobile-menu" aria-label="Мобильная навигация" aria-hidden="true">
+      <ul class="mobile-nav">
+        <li><a href="#author">Автор</a></li>
+        <li><a href="#season1">Сезон 1</a></li>
+        <li><a href="#season2">Сезон 2 🔒</a></li>
+        <li><a href="#season3">Сезон 3 🔒</a></li>
+        <li><a href="#contact">Контакты</a></li>
+        <!-- Дополнительная ссылка только в мобильном меню -->
+        <li><a href="#cta">Забрать PDF</a></li>
+      </ul>
+
+      <!-- CTA-кнопка в мобильном меню, отделена линией -->
+      <div class="mobile-menu-cta">
+        <a href="https://t.me/Masha_DesignLab" target="_blank" rel="noopener noreferrer"
+           class="btn-ghost" style="display:block; text-align:center; padding:14px 28px;">
+          Войти в Лабораторию
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ========================================
+         HERO — Главная секция
+         Сплит-экран: текст слева, терминал справа
+         ======================================== -->
+    <section id="hero" class="hero">
+
+      <!-- Фоновые боке-пятна -->
+      <div class="hero-bg" aria-hidden="true">
+        <div class="bokeh-1"></div>
+        <div class="bokeh-2"></div>
+      </div>
+
+      <div class="hero-content">
+        <div class="container">
+          <div class="hero-grid">
+
+            <!-- Левая колонка: текстовый блок -->
+            <div class="hero-text">
+
+              <!-- Тег-бейдж над H1 -->
+              <div class="hero-badge" aria-label="Сезон 1 — Основы">
+                <span class="hero-badge-dot" aria-hidden="true">●</span>
+                СЕЗОН 1 · ОСНОВЫ
+              </div>
+
+              <!-- H1 -->
+              <h1 class="hero-title">
+                АНАТОМИЯ
+                <span class="hero-title-accent">ПРОМТА</span>
+              </h1>
+
+              <!-- Подзаголовок -->
+              <p class="hero-subtitle">
+                Формула идеального запроса.<br>
+                Как перестать писать в пустоту<br>
+                и начать управлять ИИ на языке смыслов
+              </p>
+
+              <!-- Теги-пилюли -->
+              <div class="hero-tags" aria-label="Темы курса">
+                <div class="hero-tag">
+                  <span class="hero-tag-dot teal" aria-hidden="true">●</span>
+                  Промт-инжиниринг
+                </div>
+                <div class="hero-tag">
+                  <span class="hero-tag-dot orange" aria-hidden="true">●</span>
+                  Tilda · Zero Block
+                </div>
+                <div class="hero-tag">
+                  <span class="hero-tag-dot teal" aria-hidden="true">●</span>
+                  ИИ · Dark Passenger
+                </div>
+              </div>
+
+              <!-- CTA-кнопка: скролл к первому блоку -->
+              <a href="#author" class="btn-primary">Посмотреть структуру ↓</a>
+            </div>
+
+            <!-- Правая колонка: терминал -->
+            <div class="hero-terminal">
+              <div class="terminal" id="terminal">
+
+                <!-- Шапка терминала -->
+                <div class="terminal-header">
+                  <div class="terminal-dots" aria-hidden="true">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                  </div>
+                  <span class="terminal-filename">anatomy.css</span>
+                </div>
+
+                <!-- Тело терминала: строки кода с синтаксической подсветкой -->
+                <div class="terminal-body" role="region" aria-label="Редактор кода">
+
+                  <div class="code-line"><span class="line-number">1</span><span class="line-content"><span class="token-comment">/* designer who codes */</span></span></div>
+                  <div class="code-line"><span class="line-number">2</span><span class="line-content"><span class="token-selector">:root</span><span class="token-punctuation"> {</span></span></div>
+                  <div class="code-line"><span class="line-number">3</span><span class="line-content"><span class="token-property">  --talent</span><span class="token-punctuation">: </span><span class="token-value">visual + logic</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">4</span><span class="line-content"><span class="token-property">  --stack</span><span class="token-punctuation">: </span><span class="token-value">tilda, claude, vscode</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">5</span><span class="line-content"><span class="token-property">  --mode</span><span class="token-punctuation">: </span><span class="token-value">always building</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">6</span><span class="line-content"><span class="token-punctuation">}</span></span></div>
+                  <div class="code-line"><span class="line-number">7</span><span class="line-content"></span></div>
+                  <div class="code-line"><span class="line-number">8</span><span class="line-content"><span class="token-selector">.masha</span><span class="token-punctuation"> {</span></span></div>
+                  <div class="code-line"><span class="line-number">9</span><span class="line-content"><span class="token-property">  display</span><span class="token-punctuation">: </span><span class="token-value">grid</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">10</span><span class="line-content"><span class="token-property">  skills</span><span class="token-punctuation">: </span><span class="token-value">design + ai + code</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">11</span><span class="line-content"><span class="token-property">  location</span><span class="token-punctuation">: </span><span class="token-value">Sochi, RU</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">12</span><span class="line-content"><span class="token-property">  animation</span><span class="token-punctuation">: </span><span class="token-value">grow infinite</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">13</span><span class="line-content"><span class="token-property">  @apply </span><span class="token-value">caffeinated</span><span class="token-punctuation">;</span></span></div>
+                  <div class="code-line"><span class="line-number">14</span><span class="line-content"><span class="token-punctuation">}</span></span></div>
+                  <div class="code-line"><span class="line-number">15</span><span class="line-content"><span class="token-comment">/* output: works that matter */</span><span class="cursor" aria-hidden="true">█</span></span></div>
+
+                </div>
+
+                <!-- Строка статуса — имитация VS Code statusbar -->
+                <div class="terminal-statusbar" aria-hidden="true">
+                  <span>● CSS · UTF-8 · LF</span>
+                  <span class="statusbar-center">· Lines: 15 · Ln 15, Col 24</span>
+                  <span>● masha-lab</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /hero-grid -->
+        </div><!-- /container -->
+      </div><!-- /hero-content -->
+    </section><!-- /hero -->
+
+    <!-- ========================================
+         СЕКЦИИ-ЗАГЛУШКИ
+         Пустые секции с правильными ID.
+         H2 — маркеры для разработчика, не финальный контент.
+         ======================================== -->
+
+    <section id="author" class="section-placeholder">
+      <div class="container">
+        <h2>Автор — кто такая Маша</h2>
+      </div>
+    </section>
+
+    <section id="season1" class="section-placeholder">
+      <div class="container">
+        <h2>Блок 1: Фундамент (Здесь будет Мастер-шаблон). Скопируй и властвуй (терминал)</h2>
+      </div>
+    </section>
+
+    <section id="breakdown" class="section-placeholder">
+      <div class="container">
+        <h2>Блок 2: Интерактивное вскрытие (тултипы)</h2>
+      </div>
+    </section>
+
+    <section id="battle" class="section-placeholder">
+      <div class="container">
+        <h2>Блок 3: Практика: Валера vs Сэм</h2>
+      </div>
+    </section>
+
+    <section id="season2" class="section-placeholder">
+      <div class="container">
+        <h2>Заглушка Сезон 2 🔒: Расширения</h2>
+      </div>
+    </section>
+
+    <section id="season3" class="section-placeholder">
+      <div class="container">
+        <h2>Заглушка Сезон 3 🔒: Хирургия</h2>
+      </div>
+    </section>
+
+    <!-- ========================================
+         CTA СЕКЦИЯ — Финальный блок перед футером
+         ======================================== -->
+    <section id="cta" class="cta-section">
+      <div class="container">
+        <h2>ЗАБРАТЬ БАЗУ</h2>
+        <p>
+          Полный гайд по Анатомии Промта в формате PDF.<br>
+          Все теги, примеры и мастер-шаблон — в одном файле
+        </p>
+        <!-- href="#" — заглушка, потом заменить на ссылку Telegram-канала -->
+        <a href="#" class="btn-primary-lg">Скачать PDF-шпаргалку →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================
+       FOOTER — Массивный типографический футер
+       ======================================== -->
+  <footer id="contact" class="footer">
+
+    <!-- Сетка: две колонки на десктопе, одна на мобиле -->
+    <div class="footer-grid">
+
+      <!-- Левая колонка: логотип и суть -->
+      <div class="footer-left">
+
+        <!-- Логотип-типографика в три строки -->
+        <div class="footer-brand" aria-label="Masha Design Lab">
+          <div class="footer-brand-line1">MASHA</div>
+          <div class="footer-brand-line2">DESIGN</div>
+          <div class="footer-brand-line3">LAB</div>
+        </div>
+
+        <!-- Три строки подписи -->
+        <p class="footer-desc">
+          Web Designer &mdash; Tilda, Zero Block &amp; здравый смысл<br>
+          Prompt Engineer &mdash; разговариваю с ИИ на языке смыслов<br>
+          Learning Dev &mdash; HTML / CSS / JS (и кофе)
+        </p>
+      </div>
+
+      <!-- Правая колонка: контакты -->
+      <div class="footer-right">
+        <p class="footer-contacts-title">Поймать Машу:</p>
+
+        <div class="footer-links">
+          <!-- Кнопка 1: Teal-фон -->
+          <a href="https://t.me/Masha_DesignLab" target="_blank" rel="noopener noreferrer"
+             class="footer-link primary">[ Вход в Лабораторию ]</a>
+
+          <!-- Кнопка 2: светлый текст -->
+          <a href="https://t.me/mashapromtai" target="_blank" rel="noopener noreferrer"
+             class="footer-link secondary">[ Написать лично ]</a>
+
+          <!-- Кнопка 3: приглушённый текст -->
+          <a href="https://www.instagram.com/masha.promt.ai/" target="_blank" rel="noopener noreferrer"
+             class="footer-link tertiary">[ Instagram (Доступ только с VPN) ]</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Строка копирайта -->
+    <div class="footer-copyright">
+      <span>Masha_DesignLab &copy; 2026</span>
+      <a href="https://t.me/Masha_DesignLab" target="_blank" rel="noopener noreferrer">
+        Сделано в Masha_DesignLab
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    /* ========================================
+       SCRIPT.JS — Весь JavaScript страницы
+       Три функции: sticky header, гамбургер, typewriter
+       ======================================== */
+
+    /* --- 1. STICKY HEADER ---
+       Добавляет класс .scrolled к шапке при скролле вниз.
+       Класс активирует затемнение фона (см. CSS .header.scrolled).
+    */
+    (function initStickyHeader() {
+      var header = document.getElementById('site-header');
+
+      function onScroll() {
+        if (window.scrollY > 20) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      }
+
+      /* passive: true — оптимизация производительности для scroll */
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+
+
+    /* --- 2. ГАМБУРГЕР-МЕНЮ ---
+       Открывает/закрывает мобильное выпадающее меню.
+       При клике на любую ссылку внутри меню — оно закрывается.
+    */
+    (function initBurgerMenu() {
+      var burgerBtn  = document.getElementById('burger-btn');
+      var mobileMenu = document.getElementById('mobile-menu');
+
+      /* Функция открытия/закрытия меню */
+      function toggleMenu() {
+        var isOpen = mobileMenu.classList.toggle('active');
+        burgerBtn.classList.toggle('active', isOpen);
+        burgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        burgerBtn.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+        mobileMenu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+
+        /* Блокируем/разблокируем скролл страницы при открытом меню */
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+      }
+
+      /* Функция закрытия меню — вызывается при клике на ссылки внутри */
+      function closeMenu() {
+        mobileMenu.classList.remove('active');
+        burgerBtn.classList.remove('active');
+        burgerBtn.setAttribute('aria-expanded', 'false');
+        burgerBtn.setAttribute('aria-label', 'Открыть меню');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      burgerBtn.addEventListener('click', toggleMenu);
+
+      /* Вешаем закрытие на ВСЕ ссылки внутри мобильного меню */
+      var mobileLinks = mobileMenu.querySelectorAll('a');
+      mobileLinks.forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+      });
+    })();
+
+
+    /* --- 3. TYPEWRITER-ЭФФЕКТ ДЛЯ ТЕРМИНАЛА ---
+       Срабатывает один раз при появлении терминала в viewport.
+       Реализован через последовательное появление строк (opacity: 0 → 1).
+       HTML-разметка строк не трогается — JS только добавляет класс .visible.
+       Intersection Observer — отслеживает момент появления элемента в viewport.
+    */
+    (function initTypewriter() {
+      var terminal   = document.getElementById('terminal');
+      var codeLines  = terminal.querySelectorAll('.code-line');
+      var hasStarted = false; /* Флаг: анимация запускается только один раз */
+
+      /* Функция запуска: делает строки видимыми по очереди с задержкой */
+      function startTypewriter() {
+        if (hasStarted) return;
+        hasStarted = true;
+
+        codeLines.forEach(function(line, index) {
+          /* Каждая строка появляется с задержкой: 100ms × номер строки */
+          setTimeout(function() {
+            line.classList.add('visible');
+          }, index * 100);
+        });
+      }
+
+      /* Intersection Observer отслеживает, когда терминал появляется в viewport.
+         threshold: 0.3 — срабатывает, когда видно 30% элемента */
+      var observer = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          startTypewriter();
+          observer.disconnect(); /* Отключаем после первого срабатывания */
+        }
+      }, { threshold: 0.3 });
+
+      observer.observe(terminal);
+    })();
+  </script>
+
+</body>
+</html>
