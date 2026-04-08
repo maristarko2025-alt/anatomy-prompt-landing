@@ -212,7 +212,7 @@
       transform-origin: center;
     }
 
-    /* Анимация гамбургера при активном меню, сейчас ее не видно, потому что меню на весь экрае перекрывает */
+    /* Анимация гамбургера при активном меню, сейчас ее не видно, потому что меню на весь экран перекрывает */
     .header-burger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .header-burger.active span:nth-child(2) { opacity: 0; }
     .header-burger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
@@ -271,6 +271,21 @@
       margin-top: var(--space-4);
       padding-top: var(--space-4);
       border-top: 1px solid var(--border-dark);
+    }
+
+    /* иконка телеграм */
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px; /* отступ между иконкой и текстом */
+      text-decoration: none;
+    }
+
+    .icon-telegram {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0; /* иконка не будет сжиматься */
+      line-height: 1; /* убирает лишние отступы */
     }
 
     /* ========================================
@@ -758,8 +773,11 @@
         <!-- CTA-кнопка — видна на планшете и десктопе -->
         <div class="header-cta">
           <a href="https://t.me/Masha_DesignLab" target="_blank" rel="noopener noreferrer" class="btn-ghost">
-            Войти в Лабораторию
-          </a>
+  <svg class="icon-telegram" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M11.944 17.97L4.58 13.216c-.48-.312-.47-.995.022-1.288L19.54 3.28c.547-.326 1.214.09 1.148.724l-1.75 12.266c-.063.443-.54.69-.92.48l-4.62-2.713a.75.75 0 00-.847.077l-3.68 3.02a.75.75 0 01-1.027-.154z"/>
+  </svg>
+  Вход в Лабораторию
+</a>
         </div>
 
         <!-- Кнопка-гамбургер — только мобильный -->
