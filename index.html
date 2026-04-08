@@ -168,23 +168,41 @@
 
     /* Ghost-кнопка (прозрачный фон + teal-рамка) */
     .btn-ghost {
-      display: inline-block;
+    /* Layout & positioning */
+      display: inline-flex;           /* ← меняем inline-block на inline-flex */
+      align-items: center;            /* ← центрируем иконку и текст по вертикали */
+      gap: 8px;                       /* ← отступ между иконкой и текстом */
+      
+    /* Typography */
       font-family: var(--font-mono);
       font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       color: var(--accent-teal);
+      line-height: 1;                 /* ← убираем лишние отступы по высоте строки */
+      white-space: nowrap;
+      text-decoration: none;          /* ← убираем подчёркивание ссылки */
+      
+    /* Visuals */
       background-color: transparent;
       border: 1px solid var(--accent-teal);
       border-radius: var(--radius);
       padding: 8px 16px;
       cursor: pointer;
       transition: background-color var(--transition), color var(--transition);
-      white-space: nowrap;
     }
+
     .btn-ghost:hover {
       background-color: var(--accent-teal);
       color: var(--bg-dark);
+    }
+
+    /* Иконка внутри кнопки */
+    .icon-telegram {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;    /* иконка не сжимается при нехватке места */
+      line-height: 1;    /* подстраховка от вертикального смещения */
     }
 
     /* CTA-кнопка в шапке — скрыта на мобильном */
@@ -273,20 +291,7 @@
       border-top: 1px solid var(--border-dark);
     }
 
-    /* иконка телеграм */
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px; /* отступ между иконкой и текстом */
-      text-decoration: none;
-    }
-
-    .icon-telegram {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0; /* иконка не будет сжиматься */
-      line-height: 1; /* убирает лишние отступы */
-    }
+    
 
     /* ========================================
        HERO — ГЛАВНАЯ СЕКЦИЯ
