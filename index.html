@@ -735,8 +735,10 @@
        ======================================== */
     @media (max-width: 767px) {
       .container { padding: 0 20px; }
+      /* Футер: выравниваем отступы с остальным контентом страницы */
+      .footer-grid { padding: 0 20px; }
       /* Копирайт: в столбик, по центру */
-      .footer-copyright { flex-direction: column; gap: var(--space-1); text-align: center; }
+      .footer-copyright { flex-direction: column; gap: var(--space-1); text-align: center; padding-left: 20px; padding-right: 20px; }
 
       /* Терминал: меньше отступов и шрифт */
       .terminal-body { padding: var(--space-2); font-size: 11px; }
